@@ -76,7 +76,7 @@ def plot_training_history(history):
     )
     return fig
 
-def plot_feature_importance(feature_importance, top_n=20):
+def plot_feature_importance(feature_importance, top_n=10):
     """Plot feature importance analysis"""
     df = pd.DataFrame({
         'Feature': list(feature_importance.keys()),
@@ -88,7 +88,7 @@ def plot_feature_importance(feature_importance, top_n=20):
                  x='Feature',
                  y='Importance',
                  title=f'Top {top_n} Feature Importance',
-                 labels={'Feature': 'K-mer', 'Importance': 'Importance Score'})
+                 labels={'Feature': 'Feature', 'Importance': 'Importance Score'})
 
     fig.update_layout(
         xaxis_tickangle=-45,
@@ -149,9 +149,6 @@ def plot_sequence_composition(sequences_df):
 
 def plot_sequence_similarity_matrix(similarity_matrix):
     """Plot sequence similarity matrix"""
-    if similarity_matrix is None:
-        return None
-
     fig = go.Figure(data=go.Heatmap(
         z=similarity_matrix,
         colorscale='Viridis',
@@ -167,31 +164,22 @@ def plot_sequence_similarity_matrix(similarity_matrix):
     )
     return fig
 
-def plot_sequence_clusters(embeddings, clusters):
-    """Plot sequence clusters using dimensionality reduction"""
-    if embeddings is None or clusters is None:
-        return None
-
-    from sklearn.decomposition import PCA
-
-    # Reduce dimensions for visualization
-    pca = PCA(n_components=2)
-    reduced_embeddings = pca.fit_transform(embeddings)
-
-    # Create DataFrame for plotting
+def plot_sequence_clusters(reduced_embeddings, clusters):
+    """Plot sequence clusters using PCA"""
     df = pd.DataFrame({
         'PC1': reduced_embeddings[:, 0],
         'PC2': reduced_embeddings[:, 1],
-        'Cluster': clusters
+        'Cluster': [f'Cluster {i+1}' for i in clusters]
     })
 
     fig = px.scatter(
-        df, x='PC1', y='PC2',
+        df,
+        x='PC1',
+        y='PC2',
         color='Cluster',
-        title='Sequence Clusters',
+        title='Sequence Clusters (PCA)',
         labels={'PC1': 'First Principal Component',
-                'PC2': 'Second Principal Component',
-                'Cluster': 'Cluster'}
+                'PC2': 'Second Principal Component'}
     )
 
     fig.update_layout(

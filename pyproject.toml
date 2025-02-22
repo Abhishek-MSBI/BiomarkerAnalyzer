@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "anthropic>=0.46.0",
     "biopython>=1.85",
     "matplotlib>=3.10.0",
     "numpy>=1.23.5",

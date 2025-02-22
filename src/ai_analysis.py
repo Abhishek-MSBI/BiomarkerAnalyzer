@@ -2,6 +2,8 @@ import numpy as np
 import streamlit as st
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import PCA
+import pandas as pd
 
 def get_sequence_features(sequence):
     """Extract basic sequence features without deep learning"""
@@ -14,6 +16,12 @@ def get_sequence_features(sequence):
     # Basic composition
     for base in ['A', 'T', 'G', 'C']:
         features.append(sequence.count(base) / len(sequence))
+    # Dinucleotide frequencies
+    dinucleotides = ['AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 
+                     'GA', 'GT', 'GG', 'GC', 'CA', 'CT', 'CG', 'CC']
+    for di in dinucleotides:
+        count = sum(1 for i in range(len(sequence)-1) if sequence[i:i+2] == di)
+        features.append(count / (len(sequence)-1))
     return np.array(features)
 
 def analyze_sequences(sequences_df):
@@ -29,13 +37,20 @@ def analyze_sequences(sequences_df):
         similarity_matrix = cosine_similarity(features)
 
         # Perform clustering
-        kmeans = KMeans(n_clusters=min(3, len(sequences_df)), random_state=42)
+        n_clusters = min(3, len(sequences_df))
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
         clusters = kmeans.fit_predict(features)
+
+        # Reduce dimensionality for visualization
+        pca = PCA(n_components=2)
+        reduced_features = pca.fit_transform(features)
 
         analysis_results = {
             'embeddings': features,
+            'reduced_embeddings': reduced_features,
             'similarity_matrix': similarity_matrix,
-            'clusters': clusters
+            'clusters': clusters,
+            'feature_importance': calculate_feature_importance(features)
         }
         return analysis_results
 
@@ -43,11 +58,16 @@ def analyze_sequences(sequences_df):
         st.error(f"Error in sequence analysis: {str(e)}")
         return None
 
-def compute_similarity_matrix(features):
-    """Compute similarity matrix between sequences"""
-    try:
-        similarity_matrix = cosine_similarity(features)
-        return similarity_matrix
-    except Exception as e:
-        st.error(f"Error computing similarity matrix: {str(e)}")
-        return None
+def calculate_feature_importance(features):
+    """Calculate feature importance based on variance"""
+    feature_names = ['Length', 'GC Content'] + \
+                   ['A Freq', 'T Freq', 'G Freq', 'C Freq'] + \
+                   ['AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC',
+                    'GA', 'GT', 'GG', 'GC', 'CA', 'CT', 'CG', 'CC']
+
+    # Calculate variance of each feature
+    importance = np.var(features, axis=0)
+    # Normalize importance scores
+    importance = importance / np.sum(importance)
+
+    return dict(zip(feature_names, importance))
