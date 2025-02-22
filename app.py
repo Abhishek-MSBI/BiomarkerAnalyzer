@@ -136,32 +136,52 @@ with tab1:
         fig = plot_kmer_distribution(kmer_freq)
         st.plotly_chart(fig, use_container_width=True)
 
-with tab2: #New AI analysis tab
+with tab2: # AI analysis tab
     if sequences_df is not None:
         st.header("AI-Powered Sequence Analysis")
+
         with st.spinner("Analyzing sequences..."):
-            analysis_results = analyze_sequences(sequences_df)
+            try:
+                analysis_results = analyze_sequences(sequences_df)
 
-            if analysis_results is not None:
-                # Plot similarity matrix
-                st.subheader("Sequence Similarity Analysis")
-                fig = plot_sequence_similarity_matrix(analysis_results['similarity_matrix'])
-                if fig is not None:
+                if analysis_results is not None:
+                    # Plot similarity matrix
+                    st.subheader("Sequence Similarity Analysis")
+                    st.info("""
+                    This visualization shows how similar the sequences are to each other.
+                    Brighter colors indicate higher similarity between sequences.
+                    """)
+                    fig = plot_sequence_similarity_matrix(analysis_results['similarity_matrix'])
+                    if fig is not None:
+                        st.plotly_chart(fig, use_container_width=True)
+
+                    # Plot clusters
+                    st.subheader("Sequence Clustering")
+                    st.info("""
+                    Sequences are grouped into clusters based on their features.
+                    Points of the same color belong to the same cluster.
+                    """)
+                    fig = plot_sequence_clusters(
+                        analysis_results['embeddings'],
+                        analysis_results['clusters']
+                    )
+                    if fig is not None:
+                        st.plotly_chart(fig, use_container_width=True)
+
+                    # Store results in session state
+                    st.session_state.ai_analysis = analysis_results
+
+                    # Show feature importance
+                    st.subheader("Feature Analysis")
+                    feature_names = ['Length', 'GC Content', 'A Frequency', 'T Frequency', 'G Frequency', 'C Frequency']
+                    feature_importance = dict(zip(feature_names, np.mean(analysis_results['embeddings'], axis=0)))
+                    fig = plot_feature_importance(feature_importance)
                     st.plotly_chart(fig, use_container_width=True)
-
-                # Plot clusters
-                st.subheader("Sequence Clustering")
-                fig = plot_sequence_clusters(
-                    analysis_results['embeddings'],
-                    analysis_results['clusters']
-                )
-                if fig is not None:
-                    st.plotly_chart(fig, use_container_width=True)
-
-                # Store results in session state
-                st.session_state.ai_analysis = analysis_results
-            else:
-                st.warning("Could not perform AI analysis. Please check your sequences and try again.")
+                else:
+                    st.warning("Could not perform advanced analysis. Using basic sequence statistics instead.")
+            except Exception as e:
+                st.error(f"Error during analysis: {str(e)}")
+                st.info("Try with a smaller dataset or check your sequence format.")
 
 with tab3:
     if st.session_state.model is not None and st.session_state.processed_data is not None:
