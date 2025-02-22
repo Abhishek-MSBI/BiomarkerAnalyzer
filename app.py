@@ -7,7 +7,7 @@ from src.data_processing import (load_genomic_data, get_sequence_stats,
 from src.model import build_cnn_model, train_model_with_progress, prepare_sequence_data
 from src.evaluate import evaluate_model, plot_roc_curve, cross_validate
 from src.visualizations import (plot_kmer_distribution, plot_sequence_length_distribution,
-                              plot_training_history)
+                               plot_training_history)
 
 st.set_page_config(page_title="Biomarker Discovery Platform", layout="wide")
 
@@ -112,4 +112,7 @@ else:
 
 # Footer
 st.markdown("---")
-st.markdown("Built with Streamlit • TensorFlow • Biopython")
+st.markdown("""
+Built with Streamlit • TensorFlow • Biopython  
+Created by ABHISHEK S R
+""")
