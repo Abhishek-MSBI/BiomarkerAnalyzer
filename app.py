@@ -11,8 +11,9 @@ from src.model import (build_cnn_model, train_model_with_progress,
 from src.evaluate import evaluate_model, plot_roc_curve, cross_validate
 from src.visualizations import (plot_kmer_distribution, plot_sequence_length_distribution,
                               plot_training_history, plot_feature_importance,
-                              plot_confusion_matrix, plot_sequence_composition)
-from src.ai_analysis import analyze_sequences, plot_sequence_similarity_matrix, plot_sequence_clusters # Added import
+                              plot_confusion_matrix, plot_sequence_composition,
+                              plot_sequence_similarity_matrix, plot_sequence_clusters)
+from src.ai_analysis import analyze_sequences
 
 # Page configuration
 st.set_page_config(
