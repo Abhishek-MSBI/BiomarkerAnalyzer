@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 import streamlit as st
+from io import StringIO
+import json
 
 def load_genomic_data(file):
-    """Load genomic data from uploaded file"""
+    """Load genomic data from uploaded file or use sample data"""
     sequences = []
     names = []
     try:
@@ -18,6 +20,17 @@ def load_genomic_data(file):
     except Exception as e:
         st.error(f"Error loading file: {str(e)}")
         return None
+
+def load_sample_data():
+    """Load sample genomic data for demonstration"""
+    sequences = [
+        "ATGCTAGCTAGCTAG",
+        "GCTAGCTAGCTAGCT",
+        "TAGCTAGCTAGCTAG",
+        "CTAGCTAGCTAGCTA"
+    ]
+    names = [f"Sample_Sequence_{i+1}" for i in range(len(sequences))]
+    return pd.DataFrame({'id': names, 'sequence': sequences})
 
 def extract_kmers(sequence, k=6):
     """Extract k-mers from sequence"""
@@ -50,8 +63,16 @@ def process_sequences(sequences_df, k=6):
     for seq in sequences_df['sequence']:
         kmers = extract_kmers(seq, k)
         all_kmers.extend(kmers)
-    
+
     # Get kmer frequencies
     kmer_freq = Counter(all_kmers)
     return kmer_freq
 
+def export_results(sequences_df, model_metrics, kmer_frequencies):
+    """Export analysis results to JSON"""
+    results = {
+        'sequences': sequences_df.to_dict(orient='records'),
+        'model_metrics': model_metrics,
+        'kmer_frequencies': dict(kmer_frequencies)
+    }
+    return json.dumps(results, indent=2)
