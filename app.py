@@ -234,9 +234,9 @@ with tab4:
                 metrics_df = pd.DataFrame({
                     'Metric': ['Precision', 'Recall', 'F1-Score'],
                     'Value': [
-                        metrics['1']['precision'],
-                        metrics['1']['recall'],
-                        metrics['1']['f1-score']
+                        metrics['precision'],
+                        metrics['recall'],
+                        metrics['f1-score']
                     ]
                 })
                 st.table(metrics_df)

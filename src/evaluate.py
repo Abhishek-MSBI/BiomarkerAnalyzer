@@ -8,11 +8,14 @@ def evaluate_model(model, X_test, y_test):
     """Evaluate model and return metrics"""
     predictions = model.predict(X_test)
     metrics = classification_report(y_test, predictions.round(), output_dict=True)
-    
+
+    # Get the positive class metrics (could be '1' or '1.0' depending on data type)
+    pos_class = '1' if '1' in metrics else '1.0'
+
     fpr, tpr, _ = roc_curve(y_test, predictions)
     roc_auc = auc(fpr, tpr)
-    
-    return metrics, fpr, tpr, roc_auc
+
+    return metrics[pos_class], fpr, tpr, roc_auc
 
 def plot_roc_curve(fpr, tpr, roc_auc):
     """Plot ROC curve using plotly"""
@@ -24,7 +27,7 @@ def plot_roc_curve(fpr, tpr, roc_auc):
                             name='Random',
                             mode='lines',
                             line=dict(dash='dash')))
-    
+
     fig.update_layout(
         title='Receiver Operating Characteristic (ROC) Curve',
         xaxis_title='False Positive Rate',
@@ -37,13 +40,13 @@ def cross_validate(model, X, y, n_splits=5):
     """Perform cross-validation"""
     kf = KFold(n_splits=n_splits, shuffle=True)
     scores = []
-    
+
     for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
         X_train, X_val = X[train_idx], X[val_idx]
         y_train, y_val = y[train_idx], y[val_idx]
-        
+
         model.fit(X_train, y_train, epochs=5, verbose=0)
         score = model.evaluate(X_val, y_val, verbose=0)
         scores.append(score[1])  # accuracy
-        
+
     return np.mean(scores), np.std(scores)
