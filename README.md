@@ -1,4 +1,17 @@
+---
+title: Viral Disease Biomarker Discovery Platform
+emoji: 🧬
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+sdk_version: "1.42.2"
+app_file: app.py
+pinned: false
+---
+
 # 🧬 Viral Disease Biomarker Discovery Platform
+
+[![Hugging Face Spaces](https://img.shields.io/badge/Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/srabhishek/BiomarkerAnalyser)
 
 A powerful platform for analyzing viral genomic sequences and identifying potential biomarkers using machine learning and deep learning approaches.
 
