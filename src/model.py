@@ -50,10 +50,17 @@ def train_model_with_progress(model, X_train, y_train, X_val, y_val, epochs=10):
 def prepare_sequence_data(kmer_frequencies, k=6):
     """Prepare sequence data for model input"""
     feature_size = 4**k  # Size for k-mer frequencies
-    X = np.zeros((1, feature_size, 1))
+    num_sequences = 1  # We'll process this as a single sample for demonstration
 
-    for i, freq in enumerate(kmer_frequencies.values()):
-        if i < feature_size:
-            X[0, i, 0] = freq
+    # Initialize feature matrix for all sequences
+    X = np.zeros((num_sequences, feature_size, 1))
 
-    return X.astype(np.float32)  # Ensure float32 dtype for TensorFlow
+    # Convert frequencies to feature vector
+    kmer_values = list(kmer_frequencies.values())
+    for i in range(min(len(kmer_values), feature_size)):
+        X[0, i, 0] = kmer_values[i]
+
+    # Generate dummy labels (0 or 1) for demonstration
+    y = np.random.randint(0, 2, size=num_sequences)
+
+    return X.astype(np.float32), y  # Return both features and labels

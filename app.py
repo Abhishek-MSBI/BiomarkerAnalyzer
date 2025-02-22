@@ -83,16 +83,16 @@ if sequences_df is not None:
 
     if st.button("Train Model", key="train_model"):
         with st.spinner("Preparing data and training model..."):
-            # Prepare data
-            X = prepare_sequence_data(kmer_freq, k=k_mer_size)
-            y = np.random.randint(0, 2, size=len(sequences_df))  # Dummy labels for demonstration
+            # Prepare data - now returns both X and y
+            X, y = prepare_sequence_data(kmer_freq, k=k_mer_size)
 
             # Split data
             from sklearn.model_selection import train_test_split
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
             # Build and train model
-            st.session_state.model = build_cnn_model((X.shape[1], 1), learning_rate)
+            input_shape = (X.shape[1], 1)
+            st.session_state.model = build_cnn_model(input_shape, learning_rate)
 
             st.subheader("Training Progress")
             st.session_state.training_history = train_model_with_progress(
